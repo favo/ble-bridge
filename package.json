@@ -1,0 +1,23 @@
+{
+  "name": "ble-bridge",
+  "version": "1.0.0",
+  "description": "Bluetooth bridge for PinToMind OS and PinToMind Electron player",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/favo/ble-bridge.git"
+  },
+  "author": "Favo AS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/favo/ble-bridge/issues"
+  },
+  "homepage": "https://github.com/favo/ble-bridge#readme",
+  "dependencies": {
+    "bleno": "npm:@abandonware/bleno@^0.6.1",
+    "socket.io": "^4.7.1"
+  }
+}
