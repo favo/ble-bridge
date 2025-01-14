@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Bluetooth bridge for PinToMind OS and PinToMind Electron player",
   "main": "app.js",
+  "bin": {
+    "ble-bridge": "bin/cli.js"
+  },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
