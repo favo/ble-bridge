@@ -17,9 +17,9 @@ let maxValueSizeNetworkList
 let networkListSubscribed = false;
 let networkListCallback;
 
-let resolutionListCallback
-let resolutionListMaxValue 
-let resolutionListIsSubscribed 
+let deviceSettingsCallback
+let deviceSettingsMaxValue 
+let deviceSettingsIsSubscribed 
 
 let pincodeIsSubscribed
 let pincodeCallback
@@ -164,17 +164,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("list-of-resolutions", (data) => {
-    if (resolutionListIsSubscribed && resolutionListCallback != null) {
+  socket.on("device-settings", (data) => {
+    if (deviceSettingsIsSubscribed && deviceSettingsCallback != null) {
       const stringData = JSON.stringify(data);
-      const chunkSize = resolutionListMaxValue;
+      const chunkSize = deviceSettingsMaxValue;
       
       let offset = 0;
       const sendNextChunk = () => {
         if (offset >= stringData.length) return; 
 
         const chunk = Buffer.from(stringData.slice(offset, offset + chunkSize));
-        resolutionListCallback(chunk);
+        deviceSettingsCallback(chunk);
 
         offset += chunkSize; 
         setTimeout(sendNextChunk, 20);
@@ -213,12 +213,12 @@ bleCallbacks.sendNetworkList = (status, maxValueSize, callback) => {
   io.sockets.emit("get-network-list");
 };
 
-bleCallbacks.sendResolutionList = (status, maxValueSize, callback) => {
-  resolutionListIsSubscribed = status
-  resolutionListMaxValue = maxValueSize
-  resolutionListCallback = callback;
+bleCallbacks.sendDeviceSettings = (status, maxValueSize, callback) => {
+  deviceSettingsIsSubscribed = status
+  deviceSettingsMaxValue = maxValueSize
+  deviceSettingsCallback = callback;
 
-  io.sockets.emit("get-resolution-list");
+  io.sockets.emit("get-device-settings");
 };
 
 bleCallbacks.notifyPincode = (status, callback) => {

@@ -16,7 +16,7 @@ const NOTIFY_NETWORK_LIST_CHARACTERISTIC_UUID =
   "89496822205000000000000000000000";
 const NOTIFY_NETWORK_CONNECTION_CHARACTERISTIC_UUID =
   "89496822206000000000000000000000";
-const NOTIFY_RESOLUTION_LIST_CHARACTERISTIC_UUID =
+const NOTIFY_DEVICE_SETTINGS_CHARACTERISTIC_UUID =
   "89496822207000000000000000000000";
 const NOTIFY_PINCODE_CHARACTERISTIC_UUID = 
   "89496822211000000000000000000000";
@@ -29,7 +29,7 @@ export const bleCallbacks = {
   onSetDns: (dns) => {},
   onSetResolution: (res) => {},
   sendNetworkList: (isSubscribed, maxValueSize, callback) => {},
-  sendResolutionList: (isSubscribed, maxValueSize, callback) => {},
+  sendDeviceSettings: (isSubscribed, maxValueSize, callback) => {},
   notifyNetworkConnection: (isSubscribed, callback) => {},
   notifyPincode: (isSubscribed, callback) => {},
   finishSetup: () => {},
@@ -126,16 +126,16 @@ const notifyNetworkConnectionCharacteristic = new bleno.Characteristic({
   },
 });
 
-const notifyResolutionListCharacteristic = new bleno.Characteristic({
-  uuid: NOTIFY_RESOLUTION_LIST_CHARACTERISTIC_UUID,
+const notifyDeviceSettingsCharecteristic = new bleno.Characteristic({
+  uuid: NOTIFY_DEVICE_SETTINGS_CHARACTERISTIC_UUID,
   properties: ["notify"],
   onSubscribe: (maxValueSize, updateValueCallback) => {
-    console.log("notifyResolutionListCharacteristic - onSubscribe");
-    bleCallbacks.sendResolutionList(true, maxValueSize, updateValueCallback);
+    console.log("notifyDeviceSettingsCharecteristic - onSubscribe");
+    bleCallbacks.sendDeviceSettings(true, maxValueSize, updateValueCallback);
   },
   onUnsubscribe: () => {
-    console.log("notifyResolutionListCharacteristic - onUnsubscribe");
-    bleCallbacks.sendResolutionList(false, null, null);
+    console.log("notifyDeviceSettingsCharecteristic - onUnsubscribe");
+    bleCallbacks.sendDeviceSettings(false, null, null);
   },
 });
 
@@ -193,7 +193,7 @@ export const configurationService = new bleno.PrimaryService({
     setDnsCharacteristic,
     setResolutionCharacteristic,
     notifyNetworkListCharacteristic,
-    notifyResolutionListCharacteristic,
+    notifyDeviceSettingsCharecteristic,
     notifyNetworkConnectionCharacteristic,
     notifyPincodeCharacteristic,
     finishCharacteristic,
