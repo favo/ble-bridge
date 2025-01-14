@@ -26,6 +26,8 @@ let pincodeCallback
 
 let networkStatusInterval
 
+let restartOnDisconnect = false
+
 bleno.on("stateChange", (state) => {
   console.log("on -> stateChange: " + state);
   if (state === "poweredOn") {
@@ -44,6 +46,7 @@ bleno.on("advertisingStart", (err) => {
 
 bleno.on("accept", () => {
   io.sockets.emit("check-network-status");
+  restartOnDisconnect = false
   networkStatusInterval = setInterval(() => {
     io.sockets.emit("check-network-status");
   }, 3000)
@@ -54,11 +57,15 @@ bleno.on("disconnect", () => {
     clearInterval(networkStatusInterval);
     networkStatusInterval = null;
   }
+
+  if (restartOnDisconnect) {
+    io.sockets.emit("restart-bluetooth");
+  }
 });
 
 const deviceName = "rpi"
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  
   socket.on("ble-enable", (data) => {
     console.log("ble-enable");
 
@@ -225,7 +232,7 @@ bleCallbacks.notifyNetworkConnection = (status, callback) => {
 };
 
 bleCallbacks.finishSetup = () => {
-  io.sockets.emit("finish-setup");
+  restartOnDisconnect = true
 };
 
 bleCallbacks.factoryReset = () => {
