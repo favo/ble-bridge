@@ -1,6 +1,6 @@
-import bleno from "bleno";
-import { Server } from "socket.io";
-import http from "http";
+const bleno = require('@stoprocent/bleno');
+const { Server } = require("socket.io");
+const http = require("http");
 
 const SERVICE_UUID = "89496822200000000000000000000000";
 const WRITE_CHARACTERISTIC_UUID = "89496822201000000000000000000000";

@@ -6,7 +6,6 @@
   "bin": {
     "ble-bridge": "bin/cli.js"
   },
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
@@ -21,12 +20,11 @@
     "url": "https://github.com/favo/ble-bridge/issues"
   },
   "files": [
-    "app.js",
-    "ble-service.js"
+    "app.js"
   ],
   "homepage": "https://github.com/favo/ble-bridge#readme",
   "dependencies": {
-    "bleno": "npm:@abandonware/bleno@^0.6.1",
+    "@stoprocent/bleno": "^0.8.2",
     "socket.io": "^4.7.1"
   }
 }
