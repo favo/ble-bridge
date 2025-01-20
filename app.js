@@ -1,11 +1,44 @@
 import bleno from "bleno";
 import { Server } from "socket.io";
 import http from "http";
-import {
-    configurationService,
-    bleCallbacks,
-    SERVICE_UUID,
-} from "./ble-service.js";
+
+const SERVICE_UUID = "89496822200000000000000000000000";
+const WRITE_CHARACTERISTIC_UUID = "89496822201000000000000000000000";
+const NOTIFY_CHARACTERISTIC_UUID = "89496822202000000000000000000000";
+
+const bleCallbacks = {
+    writeCallback: (data) => {},
+    notifyCallback: (isSubscribed, maxValueSize, callback) => {},
+};
+
+const writeCharacteristic = new bleno.Characteristic({
+    uuid: WRITE_CHARACTERISTIC_UUID,
+    properties: ["write"],
+    onWriteRequest: (data, _offset, _withoutResponse, callback) => {
+        console.log("onWriteRequest write request: " + data.toString("utf-8"));
+        bleCallbacks.writeCallback(data);
+        callback(bleno.Characteristic.RESULT_SUCCESS);
+    },
+});
+
+const notifyCharacteristic = new bleno.Characteristic({
+    uuid: NOTIFY_CHARACTERISTIC_UUID,
+    properties: ["notify"],
+    onSubscribe: (maxValueSize, updateValueCallback) => {
+        console.log("notifyNetworkConnectionCharacteristic - onSubscribe");
+        bleCallbacks.notifyCallback(true, maxValueSize, updateValueCallback);
+    },
+    onUnsubscribe: () => {
+        console.log("notifyNetworkConnectionCharacteristic - onUnsubscribe");
+        bleCallbacks.notifyCallback(false, 0, null);
+    },
+});
+
+const configurationService = new bleno.PrimaryService({
+    uuid: SERVICE_UUID,
+    characteristics: [writeCharacteristic, notifyCharacteristic],
+});
+
 
 const io = new Server();
 
@@ -93,9 +126,10 @@ io.on("connection", (socket) => {
 });
 
 function sendDataInChunks(data, callback, chunkSize) {
+    const payloadSize = chunkSize - 3
     const jsonData = JSON.stringify(data.data);
     const key = data.key;
-    const totalPackets = Math.ceil(jsonData.length / (chunkSize - 3)); // Calculate total packets
+    const totalPackets = Math.ceil(jsonData.length / payloadSize); // Calculate total packets
 
     let offset = 0;
     let packetID = 0;
@@ -104,7 +138,7 @@ function sendDataInChunks(data, callback, chunkSize) {
         if (offset >= jsonData.length) return;
 
         // Create the chunk payload
-        const payload = Buffer.from(jsonData.slice(offset, offset + chunkSize));
+        const payload = Buffer.from(jsonData.slice(offset, offset + payloadSize));
 
         // Create a buffer for the chunk with the first three bytes reserved
         const chunk = Buffer.alloc(payload.length + 3);
@@ -123,7 +157,7 @@ function sendDataInChunks(data, callback, chunkSize) {
         }
 
         // Update the offset and packet ID
-        offset += chunkSize;
+        offset += payloadSize;
         packetID++;
 
         // Send the next chunk after a delay
