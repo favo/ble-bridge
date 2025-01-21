@@ -40,12 +40,12 @@ const configurationService = new bleno.PrimaryService({
             properties: ["notify"],
 
             onSubscribe: (maxValueSize, updateValueCallback) => {
-                console.log("notifyNetworkConnectionCharacteristic - onSubscribe");
+                console.log("NOTIFY_CHARACTERISTIC_UUID - onSubscribe");
                 notifyMaxValueSize = maxValueSize;
                 notifyCallback = updateValueCallback;
             },
             onUnsubscribe: () => {
-                console.log("notifyNetworkConnectionCharacteristic - onUnsubscribe");
+                console.log("NOTIFY_CHARACTERISTIC_UUID - onUnsubscribe");
                 notifyMaxValueSize = 0;
                 notifyCallback = undefined;
             }
@@ -142,7 +142,6 @@ function sendDataInChunks(data) {
         let packetID = 0;
 
         while (offset < total) {
-
             // Create the chunk payload
             const payload = Buffer.from(jsonData.slice(offset, offset + payloadSize));
 
