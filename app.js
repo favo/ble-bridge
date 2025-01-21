@@ -7,12 +7,10 @@ const NOTIFY_CHARACTERISTIC_UUID = "89496822202000000000000000000000";
 
 const EVENT_WRITE = "write";
 const EVENT_BLE_ENABLED = "ble-enabled";
-const EVENT_BLE_DISABLED = "ble-disabled";
 const EVENT_DEVICE_ACCEPTED = "device-accepted";
 const EVENT_DEVICE_DISCONNECTED = "device-disconnected";
 
 const SOCKET_EVENT_BLE_ENABLE = "ble-enable";
-const SOCKET_EVENT_BLE_DISABLE = "ble-disable";
 const SOCKET_EVENT_NOTIFY = "notify";
 
 const io = new Server();
@@ -89,6 +87,8 @@ bleno.on("disconnect", () => {
 
 io.on("connection", (socket) => {
     socket.on(SOCKET_EVENT_BLE_ENABLE, (data) => {
+        bleno.stopAdvertising();
+
         const deviceName = "rpi";
         const bluetooth_id = data.bluetooth_id;
 
@@ -123,11 +123,6 @@ io.on("connection", (socket) => {
                 }
             }
         );
-    });
-
-    socket.on(SOCKET_EVENT_BLE_DISABLE, () => {
-        bleno.stopAdvertising();
-        io.emit(EVENT_BLE_DISABLED);
     });
 
     socket.on(SOCKET_EVENT_NOTIFY, (data) => {
