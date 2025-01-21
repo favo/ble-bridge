@@ -1,24 +1,21 @@
 const bleno = require("@stoprocent/bleno");
 const { Server } = require("socket.io");
-const http = require("http");
 
 const SERVICE_UUID = "89496822200000000000000000000000";
 const WRITE_CHARACTERISTIC_UUID = "89496822201000000000000000000000";
 const NOTIFY_CHARACTERISTIC_UUID = "89496822202000000000000000000000";
 
-const EVENT_WRITE = "write"
-const EVENT_BLE_ENABLED = "ble-enabled"
-const EVENT_BLE_DISABLED = "ble-disabled"
-const EVENT_DEVICE_ACCEPTED = "device-accepted"
-const EVENT_DEVICE_DISCONNECTED = "device-disconnected"
+const EVENT_WRITE = "write";
+const EVENT_BLE_ENABLED = "ble-enabled";
+const EVENT_BLE_DISABLED = "ble-disabled";
+const EVENT_DEVICE_ACCEPTED = "device-accepted";
+const EVENT_DEVICE_DISCONNECTED = "device-disconnected";
 
-const SOCKET_EVENT_BLE_ENABLE = "ble-enable"
-const SOCKET_EVENT_BLE_DISABLE = "ble-disable"
-const SOCKET_EVENT_NOTIFY = "notify"
+const SOCKET_EVENT_BLE_ENABLE = "ble-enable";
+const SOCKET_EVENT_BLE_DISABLE = "ble-disable";
+const SOCKET_EVENT_NOTIFY = "notify";
 
 const io = new Server();
-
-let blenoReady = false;
 
 let notifyMaxValueSize = 0;
 let notifyCallback;
@@ -61,7 +58,12 @@ bleno.on("stateChange", (state) => {
     console.log("on -> stateChange: " + state);
 
     if (state === "poweredOn") {
-        blenoReady = true;
+        console.log("opening socket...")
+        io.listen(3333, { hostname: "127.0.0.1" });
+    }
+    else {
+        console.log("closing socket...")
+        io.close()
     }
 });
 
@@ -87,42 +89,40 @@ bleno.on("disconnect", () => {
 
 io.on("connection", (socket) => {
     socket.on(SOCKET_EVENT_BLE_ENABLE, (data) => {
-        if (blenoReady) {
-            const deviceName = "rpi";
-            const bluetooth_id = data.bluetooth_id;
+        const deviceName = "rpi";
+        const bluetooth_id = data.bluetooth_id;
 
-            const advertisementData = Buffer.concat([
-                Buffer.from([0x02, 0x01, 0x06]),
-                Buffer.from([deviceName.length + 1, 0x09]),
-                Buffer.from(deviceName),
-                Buffer.from([bluetooth_id.length + 1 + 1, 0xff]),
-                Buffer.from(bluetooth_id),
-                Buffer.from([data.firstTime ? 1 : 0])
-            ]);
+        const advertisementData = Buffer.concat([
+            Buffer.from([0x02, 0x01, 0x06]),
+            Buffer.from([deviceName.length + 1, 0x09]),
+            Buffer.from(deviceName),
+            Buffer.from([bluetooth_id.length + 1 + 1, 0xff]),
+            Buffer.from(bluetooth_id),
+            Buffer.from([data.firstTime ? 1 : 0])
+        ]);
 
-            const scanResponseData = Buffer.concat([
-                Buffer.from([0x11, 0x07]), // Length and type for complete list of 128-bit Service UUIDs
-                Buffer.from(
-                    SERVICE_UUID.match(/.{1,2}/g)
-                        .reverse()
-                        .join(""),
-                    "hex"
-                ) // Service UUID in little-endian format
-            ]);
+        const scanResponseData = Buffer.concat([
+            Buffer.from([0x11, 0x07]), // Length and type for complete list of 128-bit Service UUIDs
+            Buffer.from(
+                SERVICE_UUID.match(/.{1,2}/g)
+                    .reverse()
+                    .join(""),
+                "hex"
+            ) // Service UUID in little-endian format
+        ]);
 
-            bleno.startAdvertisingWithEIRData(
-                advertisementData,
-                scanResponseData,
-                (err) => {
-                    if (err) {
-                        console.error("Failed to start advertising:", err);
-                    } else {
-                        console.log("Advertising started successfully");
-                        io.emit(EVENT_BLE_ENABLED);
-                    }
+        bleno.startAdvertisingWithEIRData(
+            advertisementData,
+            scanResponseData,
+            (err) => {
+                if (err) {
+                    console.error("Failed to start advertising:", err);
+                } else {
+                    console.log("Advertising started successfully");
+                    io.emit(EVENT_BLE_ENABLED);
                 }
-            );
-        }
+            }
+        );
     });
 
     socket.on(SOCKET_EVENT_BLE_DISABLE, () => {
@@ -140,7 +140,7 @@ function sendDataInChunks(data) {
         const payloadSize = notifyMaxValueSize - 3;
         const jsonData = JSON.stringify(data.data);
         const key = data.key;
-        const total = jsonData.length
+        const total = jsonData.length;
         const totalPackets = Math.ceil(total / payloadSize); // Calculate total packets
 
         let offset = 0;
@@ -170,7 +170,3 @@ function sendDataInChunks(data) {
         }
     }
 }
-
-const httpServer = http.createServer();
-io.attach(httpServer);
-httpServer.listen(3333, "127.0.0.1");
