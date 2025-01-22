@@ -87,7 +87,6 @@ bleno.on("disconnect", () => {
 
 io.on("connection", (socket) => {
     socket.on(SOCKET_EVENT_BLE_ENABLE, (data) => {
-        bleno.stopAdvertising();
 
         const deviceName = "rpi";
         const bluetooth_id = data.bluetooth_id;
