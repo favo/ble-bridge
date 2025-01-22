@@ -135,32 +135,35 @@ function sendDataInChunks(data) {
         const payloadSize = notifyMaxValueSize - 3;
         const jsonData = JSON.stringify(data.data);
         const key = data.key;
-        const total = jsonData.length;
-        const totalPackets = Math.ceil(total / payloadSize); // Calculate total packets
+        
+        if (jsonData && key) {
+            const total = jsonData.length;
+            const totalPackets = Math.ceil(total / payloadSize); // Calculate total packets
 
-        let offset = 0;
-        let packetID = 0;
+            let offset = 0;
+            let packetID = 0;
 
-        while (offset < total) {
-            // Create the chunk payload
-            const payload = Buffer.from(jsonData.slice(offset, offset + payloadSize));
+            while (offset < total) {
+                // Create the chunk payload
+                const payload = Buffer.from(jsonData.slice(offset, offset + payloadSize));
 
-            // Create a buffer for the chunk with the first three bytes reserved
-            const chunk = Buffer.alloc(payload.length + 3);
+                // Create a buffer for the chunk with the first three bytes reserved
+                const chunk = Buffer.alloc(payload.length + 3);
 
-            // Add the metadata
-            chunk[0] = key; // First byte: data.key
-            chunk[1] = packetID; // Second byte: packet ID
-            chunk[2] = totalPackets; // Third byte: total packets
+                // Add the metadata
+                chunk[0] = key; // First byte: data.key
+                chunk[1] = packetID; // Second byte: packet ID
+                chunk[2] = totalPackets; // Third byte: total packets
 
-            // Add the actual payload
-            payload.copy(chunk, 3);
+                // Add the actual payload
+                payload.copy(chunk, 3);
 
-            notifyCallback(chunk);
+                notifyCallback(chunk);
 
-            // Update the offset and packet ID
-            offset += payloadSize;
-            packetID++;
+                // Update the offset and packet ID
+                offset += payloadSize;
+                packetID++;
+            }
         }
     }
 }
