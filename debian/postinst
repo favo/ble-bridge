@@ -18,6 +18,6 @@ else
 fi
 
 # Enable your BLE bridge service
-systemctl enable ble-bridge
+systemctl enable pintomind-ble-bridge
 
 echo "✅ Post-installation steps complete."
