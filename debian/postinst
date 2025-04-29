@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+echo "🔧 Post-install: configuring services and permissions..."
+
+# Enable bluetooth-power service
+systemctl enable bluetooth-power
+
+# Disable built-in bluetooth service
+systemctl disable bluetooth
+
+# Set correct capabilities on Node.js binary
+NODE_BIN=$(command -v node)
+if [ -n "$NODE_BIN" ]; then
+  setcap cap_net_raw+eip "$(readlink -f "$NODE_BIN")"
+else
+  echo "⚠️ Warning: Node.js binary not found!"
+fi
+
+# Enable your BLE bridge service
+systemctl enable ble-bridge
+
+echo "✅ Post-installation steps complete."

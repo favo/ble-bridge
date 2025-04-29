@@ -39,14 +39,20 @@ npm install --omit=dev --force --arch=arm64 --platform=linux
 # Setup clean /package directory (inside temp mount)
 echo "📁 Setting up package filesystem layout in /package ..."
 rm -rf /package/* || true
-mkdir -p /package/usr/local/bin
-mkdir -p /package/opt/pintomind/ble-bridge
+
+mkdir -p /package/opt/pintomind/ble-bridge/bin
 mkdir -p /package/DEBIAN
 
 # Copy project files into /package
 cp app.js package.json /package/opt/pintomind/ble-bridge
-cp -r bin /package/opt/pintomind/ble-bridge
+cp bin/cli.js /package/opt/pintomind/ble-bridge/bin/ble-bridge
 cp -r node_modules /package/opt/pintomind/ble-bridge
+
+chmod 755 /package/opt/pintomind/ble-bridge/bin/ble-bridge
+
+echo "🛠 Copying systemd service files..."
+mkdir -p /package/etc/systemd/system
+cp debian/systemd/*.service /package/etc/systemd/system/
 
 # Prepare /package/DEBIAN/control
 if [ ! -f debian/control ]; then
@@ -59,6 +65,10 @@ sed -e "s/@PACKAGE@/$PACKAGE/g" \
     -e "s/@VERSION@/$VERSION/g" \
     -e "s/@MAINTAINER@/$MAINTAINER/g" \
     debian/control > /package/DEBIAN/control
+
+echo "🛠 Copying postinst script..."
+cp debian/postinst /package/DEBIAN/postinst
+chmod 755 /package/DEBIAN/postinst
 
 # Build the .deb package
 OUTPUT_DEB="${PACKAGE}_${VERSION}_arm64.deb"
