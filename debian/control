@@ -1,0 +1,8 @@
+Package: @PACKAGE@
+Version: @VERSION@
+Section: base
+Priority: optional
+Architecture: arm64
+Maintainer: @MAINTAINER@
+Depends: nodejs
+Description: BLE-Bridge for pintomind-player packaged for Raspberry Pi (64-bit).
