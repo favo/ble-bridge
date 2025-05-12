@@ -1,6 +1,6 @@
 {
   "name": "ble-bridge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Bluetooth bridge for PinToMind OS and PinToMind Electron player",
   "main": "app.js",
   "bin": {
@@ -8,8 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "postinstall": "bash ./prepare-upgrade.sh"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,7 @@
   },
   "files": [
     "app.js",
-    "prepare-upgrade.sh"
+    "prepare-upgrade.js"
   ],
   "homepage": "https://github.com/favo/ble-bridge#readme",
   "dependencies": {
