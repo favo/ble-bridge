@@ -1,6 +1,6 @@
 {
   "name": "ble-bridge",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bluetooth bridge for PinToMind OS and PinToMind Electron player",
   "main": "app.js",
   "bin": {
@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "postinstall": "node prepare-upgrade.js"
+    "postinstall": "bash ./prepare-upgrade.sh"
   },
   "repository": {
     "type": "git",
